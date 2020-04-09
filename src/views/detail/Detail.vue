@@ -10,8 +10,9 @@
      <detail-comment-info ref="comment" :comment-info="commentInfo"></detail-comment-info>
      <goods-list ref="recommend" :goods="recommends"></goods-list>
    </scroll>
-    <detail-botton-bar></detail-botton-bar>
+    <detail-botton-bar @addCart="addToCart"></detail-botton-bar>
      <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
+     <!-- <toast :message="message" :show="show"></toast> -->
   </div>
 </template>
 
@@ -25,6 +26,7 @@
  import DetailCommentInfo from './childcomponents/DetailCommentInfo.vue'
  import DetailBottonBar from './childcomponents/DetailBottomBar.vue'
  // import DetailRecommendInfo from './childcomponents/DetailRecommendInfo.vue'
+// import Toast from 'components/common/toast/Toast.vue'
 
 import Scroll from 'components/common/scroll/Scroll.vue'
 import GoodsList from 'components/content/goods/GoodsList.vue'
@@ -45,7 +47,9 @@ import BackTop from 'components/content/backTop/BackTop.vue'
         recommends:[],
         themeTopYs:[],
         currentIndex:0,
-        isShowBackTop:false
+        isShowBackTop:false,
+        message:'',
+        show:false
 
       }
     },
@@ -100,7 +104,8 @@ import BackTop from 'components/content/backTop/BackTop.vue'
       DetailBottonBar,
       Scroll,
       GoodsList,
-      BackTop
+      BackTop,
+      // Toast
     },
     methods:{
       backClick() {
@@ -111,7 +116,8 @@ import BackTop from 'components/content/backTop/BackTop.vue'
         this.$refs.scroll.refresh()
           //根据新的数据 dom 渲染完了 但是图片还么有
 
-      },imageLoad2(){
+      },
+      imageLoad2(){
         this.themeTopYs= []
         this.themeTopYs.push(0)
         this.themeTopYs.push(this.$refs.params.$el.offsetTop-44)
@@ -141,6 +147,27 @@ import BackTop from 'components/content/backTop/BackTop.vue'
           }
         }
         this.isShowBackTop = this.isShowBackTop = (-position.y) > 1000
+      },
+      addToCart(){
+        //获取购物车需要展示的数据
+        const product ={}
+        product.image = this.topImages[0];
+        product.title = this.goods.title;
+        product.desc = this.goods.desc;
+        product.price = this.goods.nowPrice;
+        product.iid = this.iid;
+        //添加到购物车
+        this.$store.dispatch('addCart',product).then(res => {
+          // console.log(res)
+          // this.show =true
+          // this.message = res
+          // setTimeout(()=>{
+          //   this.show = false
+          //   this.message = ''
+          // },1500)
+          this.$toast.show(res,1500)
+        })
+
       }
     }
   }
